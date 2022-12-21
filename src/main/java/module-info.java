@@ -8,4 +8,6 @@ module com.example.socialnet {
     exports com.example.socialnet;
     exports controller;
     opens controller to javafx.fxml;
+    opens domain to javafx.fxml;
+    exports domain;
 }

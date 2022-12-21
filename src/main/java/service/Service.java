@@ -66,7 +66,6 @@ public class Service {
 
     private List<User> getUsersByName(String name){
         ArrayList<User> matchingUsers = new ArrayList<>();
-        matchingUsers = (ArrayList<User>) getListOfUsers();
 
         name = name.toLowerCase();
 
@@ -127,6 +126,20 @@ public class Service {
         return null;
     }
 
+    public Friendship changeAcceptStatus(Long l1, Long l2){
+        if(l2 < l1){
+            Long aux = l1;
+            l1 = l2;
+            l2 = aux;
+        }
+        for(Friendship f : getFriendships()){
+            if(f.getUser1() == l1 && f.getUser2() == l2)
+                f.setAccepted(true);
+            return f;
+        }
+        return null;
+    }
+
     public Friendship updateFriendship(Long l1, Long l2){
         boolean bool1 = repo.find(l1).addFriend(repo.find(l2));
         boolean bool2 = repo.find(l2).addFriend(repo.find(l1));
@@ -173,11 +186,41 @@ public class Service {
     public List<User> getFriendsForUser(User user){
         List<User> list = new ArrayList<User>();
         for(Friendship f : getFriendships()) {
-            if (f.getUser1() == user.getId())
+            if (f.getUser1() == user.getId() && f.getAccepted())
                 list.add(repo.find(f.getUser2()));
             else
-                if(f.getUser2() == user.getId())
+                if(f.getUser2() == user.getId() && f.getAccepted())
                     list.add(repo.find(f.getUser1()));
+        }
+        return list;
+    }
+
+    public List<User> getNonFriendsForUser(User user){
+        List<User> friends = getFriendRequests(user);
+        List<User> allUsers = getListOfUsers();
+        List<User> list = new ArrayList<>();
+        for(User u : allUsers){
+            boolean good = true;
+            for(User u1 : friends){
+                if(Objects.equals(u1.getId(), u.getId()) && Objects.equals(u.getId(), user.getId())) {
+                    good = false;
+                    break;
+                }
+            }
+            if(good)
+                list.add(u);
+        }
+        return list;
+    }
+
+    public List<User> getFriendRequests(User user){
+        List<User> list = new ArrayList<>();
+        for(Friendship f : getFriendships()) {
+            if (f.getUser1() == user.getId() && !f.getAccepted())
+                list.add(repo.find(f.getUser2()));
+            else
+            if(f.getUser2() == user.getId() && !f.getAccepted())
+                list.add(repo.find(f.getUser1()));
         }
         return list;
     }
@@ -188,6 +231,12 @@ public class Service {
      * @return list of friendships
      */
     public Iterable<Friendship> getFriendships() { return network.getAll(); }
+
+    public void updateFriendship2(Long id1, Long id2, Long newId1, Long newId2) {
+        Friendship friendship = new Friendship(id1, id2);
+        Friendship newFriendship = new Friendship(newId1, newId2);
+        network.update2(friendship, newFriendship);
+    }
 
     /***
      *

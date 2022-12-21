@@ -95,7 +95,7 @@ public class HelloController {
 
             InterfaceController ctrl =loader.getController();
             ctrl.setService(service, name);
-            ctrl.loadCommunity();
+            //ctrl.loadCommunity();
 
             ctrl.welcomeUser(name);
 

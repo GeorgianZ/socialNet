@@ -9,6 +9,8 @@ public class Friendship extends Entity<Tuple<Long, Long>> {
 
     private LocalDateTime dateTime;
 
+    private boolean accepted;
+
 
     /***
      * Friendship constructor
@@ -18,6 +20,7 @@ public class Friendship extends Entity<Tuple<Long, Long>> {
     public Friendship(long user1, long user2) {
         this.user1 = user1;
         this.user2 = user2;
+        this.accepted = false;
         if (user1 < user2) {
             setId(new Tuple<>(user1, user2));
         } else {
@@ -60,6 +63,14 @@ public class Friendship extends Entity<Tuple<Long, Long>> {
         this.user2 = user2;
     }
 
+    public boolean getAccepted(){
+        return this.accepted;
+    }
+
+    public void setAccepted(boolean accepted){
+        this.accepted = accepted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -79,6 +90,7 @@ public class Friendship extends Entity<Tuple<Long, Long>> {
                 "user1=" + user1 +
                 ", user2=" + user2 +
                 ", dateTime=" + dateTime +
+                ", accepted=" + accepted +
                 '}';
     }
 }

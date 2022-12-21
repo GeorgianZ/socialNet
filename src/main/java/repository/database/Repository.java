@@ -63,5 +63,6 @@ public interface Repository<ID, E extends Entity<ID>> {
 
     E findByUsernameAndPassword(String username, String password);
 
+    void update2(E friendship, E newFriendship);
 }
 

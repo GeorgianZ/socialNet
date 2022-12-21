@@ -80,7 +80,7 @@ public class RegisterController {
 
                 InterfaceController ctrl =loader.getController();
                 ctrl.setService(service, userName);
-                ctrl.loadCommunity();
+                //ctrl.loadCommunity();
 
                 ctrl.welcomeUser(userName);
 

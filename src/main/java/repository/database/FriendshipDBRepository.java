@@ -66,10 +66,14 @@ public class FriendshipDBRepository implements Repository<Tuple<Long,Long>, Frie
                 Long id_user1 = resultSet.getLong("user1");
                 Long id_user2 = resultSet.getLong("user2");
                 Friendship friendship;
-                if(id_user1 < id_user2)
+                if(id_user1 < id_user2){
                     friendship = new Friendship(id_user1,id_user2);
-                else
-                    friendship = new Friendship(id_user2,id_user1);
+                    friendship.setAccepted(resultSet.getBoolean("accepted"));
+                }
+                else {
+                    friendship = new Friendship(id_user2, id_user1);
+                    friendship.setAccepted(resultSet.getBoolean("accepted"));
+                }
                 friendships.add(friendship);
             }
             return friendships;
@@ -81,7 +85,7 @@ public class FriendshipDBRepository implements Repository<Tuple<Long,Long>, Frie
 
     @Override
     public Friendship save(Friendship entity) {
-        String sql = "insert into friendship (user1, user2, datetime) values (?, ?, ?)";
+        String sql = "insert into friendship (user1, user2, datetime, accepted) values (?, ?, ?, ?)";
         try (Connection connection = getConnection(url, username, password);
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -89,11 +93,13 @@ public class FriendshipDBRepository implements Repository<Tuple<Long,Long>, Frie
                 ps.setLong(1, entity.getUser1());
                 ps.setLong(2, entity.getUser2());
                 ps.setString(3, String.valueOf(entity.getDateTime()));
+                ps.setBoolean(4, entity.getAccepted());
             }
             else {
                 ps.setLong(2, entity.getUser1());
                 ps.setLong(1, entity.getUser2());
                 ps.setString(3, String.valueOf(entity.getDateTime()));
+                ps.setBoolean(4, entity.getAccepted());
             }
             ps.executeUpdate();
             return entity;
@@ -124,10 +130,21 @@ public class FriendshipDBRepository implements Repository<Tuple<Long,Long>, Frie
 
     }
 
-    @Override
-    public Friendship update(Friendship entity) {
-        return null;
+    public void update2(Friendship entity, Friendship newEntity) {
+        String sql = "UPDATE friendship SET accepted=? WHERE user1=? AND user2=?";
+        try (Connection connection = DriverManager.getConnection(url, username, password); PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setBoolean(1, true);
+            statement.setLong(2, entity.getUser1());
+            statement.setLong(3, entity.getUser2());
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    public Friendship update(Friendship f){return null;}
 
     @Override
     public Friendship findByUsernameAndPassword(String username, String password) {

@@ -1,9 +1,8 @@
 package controller;
 
 import com.example.socialnet.SocialApplication;
+import domain.Friendship;
 import domain.User;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,18 +14,21 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import service.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class SearchController {
-
+public class NotificationsController {
     Service service;
 
     private String name;
 
     ObservableList<User> model = FXCollections.observableArrayList();
+
+    LocalDateTime date;
+
     @FXML
     TableView<User> tableView;
 
@@ -39,42 +41,24 @@ public class SearchController {
     @FXML
     TableColumn<User, String> username;
 
-    @FXML
-    Button addFriendButton;
 
     @FXML
     Button homeButton;
 
     @FXML
-    TextField searchBox;
+    Button acceptButton;
+
+    @FXML
+    Button declineButton;
+    
+    @FXML
+    Label dateLabel;
 
     public void setService(Service service, String name) {
         this.service = service;
         //users.setAll(getFriendsWithUser());
         this.name = name;
-    }
-
-    public void update(){
-        Predicate<User> p1 = n -> n.getUsername().contains(searchBox.getText());
-        Predicate<User> p2 = n -> n.getFirstName().contains(searchBox.getText());
-        Predicate<User> p3 = n -> n.getLastName().contains(searchBox.getText());
-
-        model.setAll(getFriendsWithUser()
-                .stream()
-                .filter(p1.or(p2).or(p3))
-                .collect(Collectors.toList()));
-    }
-
-
-    private List<User> getFriendsWithUser(){
-        /*return service.getFriendsForUser(service.findUserByUsername(this.name))
-                .stream()
-                .map(u -> new User(u.getFirstName(), u.getLastName(), u.getUsername(), u.getPassword()))
-                .collect(Collectors.toList());*/
-        return service.getNonFriendsForUser(service.findUserByUsername(this.name))
-                .stream()
-                .map(u -> new User(u.getFirstName(), u.getLastName(), u.getUsername(), u.getPassword()))
-                .collect(Collectors.toList());
+        initModel();
     }
 
     @FXML
@@ -83,31 +67,55 @@ public class SearchController {
         this.first_name.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
         this.username.setCellValueFactory(new PropertyValueFactory<User, String>("username"));
         this.tableView.setItems(this.model);
+    }
 
-        searchBox.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                update();
-            }
-        });
+    private void initModel(){
+        List<User> friendsList = StreamSupport.stream(getFriendsWithUser().spliterator(), false).collect(Collectors.toList());
+        model.setAll(friendsList);
+    }
+
+    private List<User> getFriendsWithUser(){
+        /*return service.getFriendsForUser(service.findUserByUsername(this.name))
+                .stream()
+                .map(u -> new User(u.getFirstName(), u.getLastName(), u.getUsername(), u.getPassword()))
+                .collect(Collectors.toList());*/
+        return service.getFriendRequests(service.findUserByUsername(this.name))
+                .stream()
+                .map(u -> new User(u.getFirstName(), u.getLastName(), u.getUsername(), u.getPassword()))
+                .collect(Collectors.toList());
     }
 
     @FXML
-    private void onAddButtonClick(){
+    private void onAcceptButtonClick(){
         User user = tableView.getSelectionModel().getSelectedItem();
         User user1 = service.findUserByUsername(user.getUsername());
         System.out.println(user1.getUsername());
 
         User owner = service.findUserByUsername(this.name);
-        System.out.println(owner.getUsername());
-        System.out.println(user1.getId());
-        System.out.println(owner.getId());
-        service.addFriendship(owner.getId(), user1.getId());
-        addFriendButton.setDisable(true);
+        service.updateFriendship2(owner.getId(), user1.getId(), owner.getId(), user1.getId());
+        acceptButton.setDisable(true);
+        declineButton.setDisable(true);
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Info");
-        alert.setHeaderText("S-a trimis cererea de prietenie");
-        alert.setContentText("Cerere de prietenie trimisa cu succes");
+        alert.setHeaderText("Ati acceptat cererea de prietenie");
+        alert.setContentText("Cerere de prietenie acceptata cu succes");
+
+        alert.showAndWait();
+        System.out.println("accept");
+    }
+
+    @FXML
+    private void onDeclineButtonClick(){
+        User user = tableView.getSelectionModel().getSelectedItem();
+        model.remove(user);
+        User user1 = service.findUserByUsername(user.getUsername());
+        User owner = service.findUserByUsername(this.name);
+        service.removeFriendship(owner.getId(), user1.getId());
+        declineButton.setDisable(true);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Info");
+        alert.setHeaderText("S-a sters cererea de prietenie");
+        alert.setContentText("Cerere de prietenie stearsa cu succes");
 
         alert.showAndWait();
     }
@@ -120,9 +128,6 @@ public class SearchController {
 
             InterfaceController ctrl =loader.getController();
             ctrl.setService(service, name);
-            //ctrl.loadCommunity();
-
-            ctrl.welcomeUser(name);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root, 800, 500));
@@ -139,6 +144,21 @@ public class SearchController {
     @FXML
     public void tableViewMouseClicked() {
         User user = tableView.getSelectionModel().getSelectedItem();
-        addFriendButton.setDisable(false);
+        User user1 = service.findUserByUsername(user.getUsername());
+        User owner = service.findUserByUsername(this.name);
+        LocalDateTime time = null;
+        for(Friendship f: service.getFriendships()){
+            if(f.getUser1() == user1.getId() && f.getUser2() == owner.getId())
+                time = f.getDateTime();
+            else
+                if(f.getUser1() == owner.getId() && f.getUser2() == user1.getId()){
+                    time = f.getDateTime();
+                }
+        }
+        dateLabel.setText(String.valueOf(time));
+        acceptButton.setDisable(false);
+        declineButton.setDisable(false);
     }
+
+
 }

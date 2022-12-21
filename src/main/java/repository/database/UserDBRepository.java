@@ -176,5 +176,10 @@ public class UserDBRepository implements Repository<Long, User> {
         }
     }
 
+    @Override
+    public void update2(User friendship, User newFriendship) {
+
+    }
+
 }
 

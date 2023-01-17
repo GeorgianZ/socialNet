@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import service.MessageService;
 import service.Service;
 
 import java.time.LocalDate;
@@ -22,6 +23,8 @@ import java.util.stream.StreamSupport;
 
 public class NotificationsController {
     Service service;
+
+    MessageService messageService;
 
     private String name;
 
@@ -50,14 +53,18 @@ public class NotificationsController {
 
     @FXML
     Button declineButton;
+
+    @FXML
+    Button deleteButton;
     
     @FXML
     Label dateLabel;
 
-    public void setService(Service service, String name) {
+    public void setService(Service service, String name, MessageService messageService) {
         this.service = service;
         //users.setAll(getFriendsWithUser());
         this.name = name;
+        this.messageService = messageService;
         initModel();
     }
 
@@ -112,6 +119,7 @@ public class NotificationsController {
         User owner = service.findUserByUsername(this.name);
         service.removeFriendship(owner.getId(), user1.getId());
         declineButton.setDisable(true);
+        deleteButton.setDisable(true);
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Info");
         alert.setHeaderText("S-a sters cererea de prietenie");
@@ -127,7 +135,7 @@ public class NotificationsController {
             AnchorPane root = loader.load();
 
             InterfaceController ctrl =loader.getController();
-            ctrl.setService(service, name);
+            ctrl.setService(service, name, messageService);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root, 800, 500));
@@ -158,6 +166,7 @@ public class NotificationsController {
         dateLabel.setText(String.valueOf(time));
         acceptButton.setDisable(false);
         declineButton.setDisable(false);
+        deleteButton.setDisable(false);
     }
 
 

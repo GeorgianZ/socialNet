@@ -35,12 +35,17 @@
                         <Font size="18.0" />
                      </font>
                   </Button>
-                  <Button fx:id="homeButton" layoutX="88.0" layoutY="217.0" mnemonicParsing="false" onAction="#onHomeButtonClick" prefHeight="43.0" prefWidth="120.0" text="Home" textFill="#0dd8e7">
+                  <Button fx:id="homeButton" layoutX="88.0" layoutY="277.0" mnemonicParsing="false" onAction="#onHomeButtonClick" prefHeight="43.0" prefWidth="120.0" text="Home" textFill="#0dd8e7">
                      <font>
                         <Font size="18.0" />
                      </font>
                   </Button>
                   <Label fx:id="dateLabel" layoutX="45.0" layoutY="26.0" prefHeight="30.0" prefWidth="205.0" />
+                  <Button fx:id="deleteButton" layoutX="88.0" layoutY="210.0" mnemonicParsing="false" onAction="#onDeclineButtonClick" prefHeight="43.0" prefWidth="120.0" text="Delete friend request" textFill="#0dd8e7">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                  </Button>
                </children>
             </AnchorPane>
          </items>

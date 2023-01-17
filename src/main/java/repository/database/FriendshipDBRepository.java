@@ -6,6 +6,7 @@ import validate.Validator;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.sql.DriverManager.getConnection;
@@ -142,6 +143,11 @@ public class FriendshipDBRepository implements Repository<Tuple<Long,Long>, Frie
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Friendship> findByUsers(Tuple<Long, Long> id1, Tuple<Long, Long> id2) {
+        return null;
     }
 
     public Friendship update(Friendship f){return null;}

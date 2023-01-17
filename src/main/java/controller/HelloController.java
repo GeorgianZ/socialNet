@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import service.MessageService;
 import service.Service;
 
 import javax.crypto.Cipher;
@@ -20,6 +21,8 @@ import java.util.Objects;
 
 public class HelloController {
     Service service;
+
+    MessageService messageService;
     @FXML
     private Button loginButton;
     @FXML
@@ -94,7 +97,7 @@ public class HelloController {
             AnchorPane root = loader.load();
 
             InterfaceController ctrl =loader.getController();
-            ctrl.setService(service, name);
+            ctrl.setService(service, name, messageService);
             //ctrl.loadCommunity();
 
             ctrl.welcomeUser(name);
@@ -119,7 +122,7 @@ public class HelloController {
             AnchorPane root = loader.load();
 
             RegisterController ctrl =loader.getController();
-            ctrl.setService(service);
+            ctrl.setService(service, messageService);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root, 322, 375));
@@ -133,8 +136,9 @@ public class HelloController {
         thisStage.close();
     }
 
-    public void setService(Service service){
+    public void setService(Service service, MessageService messageService){
         this.service = service;
+        this.messageService = messageService;
     }
 
     private static byte[] getKey() {

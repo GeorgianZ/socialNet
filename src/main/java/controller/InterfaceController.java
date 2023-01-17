@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import service.MessageService;
 import service.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,8 @@ public class InterfaceController {
     ObservableList<User> users = FXCollections.observableArrayList();
 
     private Service service;
+
+    private MessageService messageService;
 
     private String name;
 
@@ -57,12 +60,16 @@ public class InterfaceController {
     Button deleteButton;
 
     @FXML
+    Button messageButton;
+
+    @FXML
     Label dateLabel;
 
-    public void setService(Service service, String name) {
+    public void setService(Service service, String name, MessageService messageService) {
         this.service = service;
         //users.setAll(getFriendsWithUser());
         this.name = name;
+        this.messageService = messageService;
         initModel();
     }
 
@@ -77,6 +84,8 @@ public class InterfaceController {
         this.first_name.setCellValueFactory(new PropertyValueFactory<User, String>("firstName"));
         this.username.setCellValueFactory(new PropertyValueFactory<User, String>("username"));
         this.tableView.setItems(this.model);
+        deleteButton.setDisable(true);
+        messageButton.setDisable(true);
     }
 
     public void welcomeUser(String name) {
@@ -112,7 +121,7 @@ public class InterfaceController {
             AnchorPane root = loader.load();
 
             SearchController ctrl =loader.getController();
-            ctrl.setService(service, name);
+            ctrl.setService(service, name, messageService);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root, 800, 500));
@@ -157,8 +166,9 @@ public class InterfaceController {
                 time = f.getDateTime();
             }
         }
-        dateLabel.setText(String.valueOf(time));
+        //dateLabel.setText(String.valueOf(time));
         deleteButton.setDisable(false);
+        messageButton.setDisable(false);
     }
 
     @FXML
@@ -169,7 +179,7 @@ public class InterfaceController {
 
             NotificationsController ctrl =loader.getController();
             LocalDateTime dateTime = LocalDateTime.now();
-            ctrl.setService(service, name);
+            ctrl.setService(service, name, messageService);
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root, 800, 500));
@@ -180,6 +190,31 @@ public class InterfaceController {
         }
 
         Stage thisStage = (Stage) notificationButton.getScene().getWindow();
+        thisStage.close();
+    }
+
+    @FXML
+    private void onMessageButtonClick(){
+        messageButton.setDisable(true);
+        User user = tableView.getSelectionModel().getSelectedItem();
+        User owner = service.findUserByUsername(this.name);
+        FXMLLoader loader = new FXMLLoader(SocialApplication.class.getResource("messages.fxml"));
+        try {
+            AnchorPane root = loader.load();
+
+            MessagesController ctrl = loader.getController();
+
+            ctrl.setService(service, user.getUsername(), owner.getUsername(), messageService);
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root, 602, 402));
+            stage.show();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        Stage thisStage = (Stage) messageButton.getScene().getWindow();
         thisStage.close();
     }
 }

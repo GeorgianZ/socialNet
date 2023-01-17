@@ -64,6 +64,14 @@ public class Service {
         return null;
     }
 
+    public User findUserById(Long id){
+        for(User u1: getUsers()){
+            if(Objects.equals(id, u1.getId()))
+                return u1;
+        }
+        return null;
+    }
+
     private List<User> getUsersByName(String name){
         ArrayList<User> matchingUsers = new ArrayList<>();
 

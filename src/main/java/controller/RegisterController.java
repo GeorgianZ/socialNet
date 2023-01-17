@@ -11,6 +11,7 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import service.MessageService;
 import service.Service;
 
 import javax.crypto.Cipher;
@@ -18,6 +19,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class RegisterController {
     Service service;
+
+    MessageService messageService;
 
     @FXML
     public TextField firstName;
@@ -79,7 +82,7 @@ public class RegisterController {
                 AnchorPane root = loader.load();
 
                 InterfaceController ctrl =loader.getController();
-                ctrl.setService(service, userName);
+                ctrl.setService(service, userName, messageService);
                 //ctrl.loadCommunity();
 
                 ctrl.welcomeUser(userName);
@@ -119,8 +122,9 @@ public class RegisterController {
         thisStage.close();
     }
 
-    public void setService(Service service){
+    public void setService(Service service, MessageService messageService){
         this.service = service;
+        this.messageService = messageService;
     }
 
     private static byte[] getKey() {

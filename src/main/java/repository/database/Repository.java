@@ -3,6 +3,8 @@ package repository.database;
 import domain.Entity;
 import validate.ValidationException;
 
+import java.util.List;
+
 public interface Repository<ID, E extends Entity<ID>> {
 
     int size();
@@ -64,5 +66,7 @@ public interface Repository<ID, E extends Entity<ID>> {
     E findByUsernameAndPassword(String username, String password);
 
     void update2(E friendship, E newFriendship);
+
+    List<E> findByUsers(ID id1, ID id2);
 }
 

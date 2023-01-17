@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import service.MessageService;
 import service.Service;
 
 import java.util.List;
@@ -23,6 +24,8 @@ import java.util.stream.StreamSupport;
 public class SearchController {
 
     Service service;
+
+    MessageService messageService;
 
     private String name;
 
@@ -48,10 +51,11 @@ public class SearchController {
     @FXML
     TextField searchBox;
 
-    public void setService(Service service, String name) {
+    public void setService(Service service, String name, MessageService messageService) {
         this.service = service;
         //users.setAll(getFriendsWithUser());
         this.name = name;
+        this.messageService = messageService;
     }
 
     public void update(){
@@ -119,7 +123,7 @@ public class SearchController {
             AnchorPane root = loader.load();
 
             InterfaceController ctrl =loader.getController();
-            ctrl.setService(service, name);
+            ctrl.setService(service, name, messageService);
             //ctrl.loadCommunity();
 
             ctrl.welcomeUser(name);

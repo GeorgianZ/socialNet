@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.sql.DriverManager.getConnection;
@@ -179,6 +180,11 @@ public class UserDBRepository implements Repository<Long, User> {
     @Override
     public void update2(User friendship, User newFriendship) {
 
+    }
+
+    @Override
+    public List<User> findByUsers(Long id1, Long id2) {
+        return null;
     }
 
 }
